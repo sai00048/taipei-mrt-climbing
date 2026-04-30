@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="🧗 雙北 + 桃園機捷沿線攀岩館完整資訊。依捷運路線分類，含票價、地址、官方社群連結，地址可直接跳轉 Google Maps。">
+<meta name="keywords" content="攀岩,抱石,捷運,台北,新北,桃園,機場捷運,攀岩館">
+<meta property="og:title" content="🧗 雙北捷運攀岩地圖">
+<meta property="og:description" content="依捷運路線分類的攀岩館資訊，含票價、地址、Google Maps 連結與官方社群">
+<meta property="og:type" content="website">
+<title>🧗 雙北捷運攀岩地圖 · MRT Climbing Map</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🧗</text></svg>">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f1a;--surface:#161929;--surface2:#1f2338;
+  --text:#eaecf5;--muted:#8b93b8;--text-soft:#c5cae3;
+  --link:#7df0c5;--accent2:#a78bfa;--card:#1a1d30;
+  --maxw:880px;
+}
+html,body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;line-height:1.6}
+body{min-height:100vh;padding-bottom:60px}
+
+/* page header */
+.page-header{
+  max-width:var(--maxw);margin:0 auto;padding:36px 22px 22px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.page-header h1{
+  font-size:28px;font-weight:700;letter-spacing:0.04em;
+  background:linear-gradient(90deg,#7df0c5 0%,#a78bfa 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  display:inline-block;
+}
+.page-header p.tagline{font-size:13.5px;color:var(--muted);margin-top:8px}
+.page-header .meta{
+  display:flex;gap:18px;flex-wrap:wrap;
+  margin-top:14px;font-size:11.5px;color:var(--muted);
+}
+.page-header .meta .stat{
+  background:rgba(125,240,197,0.08);
+  color:var(--link);padding:4px 10px;border-radius:14px;
+  border:1px solid rgba(125,240,197,0.2);
+}
+
+/* table of contents */
+.toc{
+  max-width:var(--maxw);margin:18px auto 0;padding:14px 22px;
+  display:flex;flex-wrap:wrap;gap:8px;
+}
+.toc a{
+  font-size:12px;font-weight:600;padding:6px 13px;border-radius:18px;
+  text-decoration:none;color:#fff;transition:transform 0.15s, opacity 0.15s;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.toc a:hover{transform:translateY(-1px);opacity:0.9}
+.toc a .lc{display:inline-flex;align-items:center;justify-content:center;font-weight:700;background:rgba(255,255,255,0.22);padding:1px 6px;border-radius:4px;font-size:10.5px}
+
+/* line section */
+main{max-width:var(--maxw);margin:0 auto;padding:0 22px}
+.line-section{
+  margin-top:26px;border-radius:14px;overflow:hidden;
+  background:var(--surface);border:1px solid rgba(255,255,255,0.05);
+  scroll-margin-top:18px;
+}
+.line-bar{
+  padding:14px 20px;display:flex;align-items:center;gap:10px;
+  font-weight:700;font-size:15px;color:#fff;letter-spacing:0.04em;
+}
+.line-bar .badge{
+  display:inline-flex;align-items:center;justify-content:center;font-weight:700;
+  padding:3px 9px;border-radius:6px;background:rgba(255,255,255,0.18);font-size:11.5px;
+}
+.line-bar .count{margin-left:auto;font-size:11.5px;font-weight:500;opacity:0.85}
+
+/* gym card */
+.gyms-grid{padding:14px;display:flex;flex-direction:column;gap:12px}
+.gym{
+  background:var(--card);border:1px solid rgba(255,255,255,0.06);
+  border-radius:12px;padding:16px 18px;transition:border-color 0.15s,transform 0.15s;
+}
+.gym:hover{border-color:rgba(125,240,197,0.3);transform:translateY(-1px)}
+.gym-head{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:12px;flex-wrap:wrap;margin-bottom:8px;
+}
+.gym-name{font-size:15.5px;font-weight:700;color:var(--text)}
+.gym-station{font-size:11.5px;color:var(--muted);margin-top:3px}
+.gym-station .station-dot{
+  display:inline-block;width:8px;height:8px;border-radius:50%;
+  margin-right:5px;vertical-align:middle;
+}
+.gym-types{display:flex;gap:5px;flex-wrap:wrap}
+.tbadge{
+  font-size:10.5px;padding:2px 9px;border-radius:14px;font-weight:600;
+  background:rgba(125,240,197,0.13);color:#7df0c5;border:1px solid rgba(125,240,197,0.3);
+}
+.tbadge.free{background:rgba(167,139,250,0.13);color:#c4b5fd;border-color:rgba(167,139,250,0.3)}
+.tbadge.outdoor{background:rgba(251,191,114,0.13);color:#fbbf72;border-color:rgba(251,191,114,0.3)}
+
+.gym-info{
+  display:grid;grid-template-columns:auto 1fr;gap:7px 12px;
+  font-size:13px;line-height:1.65;margin-top:6px;
+}
+.gym-info dt{color:var(--muted);font-weight:500}
+.gym-info dd{color:var(--text-soft);white-space:pre-wrap}
+.gym-info dd a{
+  color:var(--link);text-decoration:none;
+  border-bottom:1px dashed rgba(125,240,197,0.4);transition:all 0.15s;
+}
+.gym-info dd a:hover{border-bottom-color:#7df0c5;color:#a8f5d6}
+.gym-info dd a.social{margin-right:10px;display:inline-block;border-bottom:none}
+.gym-info dd a.social:hover{transform:translateY(-1px);color:#a8f5d6}
+.gym-info dd.fee{font-size:12px;line-height:1.7}
+
+/* footer */
+footer{
+  max-width:var(--maxw);margin:36px auto 0;padding:18px 22px;
+  font-size:11.5px;color:var(--muted);text-align:center;line-height:1.9;
+  border-top:1px solid rgba(255,255,255,0.05);
+}
+footer strong{color:var(--text-soft)}
+footer a{color:var(--accent2);text-decoration:none;border-bottom:1px dashed rgba(167,139,250,0.4)}
+footer a:hover{color:#c4b5fd}
+
+@media(max-width:600px){
+  .page-header{padding:24px 18px 18px}
+  .page-header h1{font-size:22px}
+  main{padding:0 14px}
+  .gym-head{flex-direction:column}
+  .gym-info{grid-template-columns:60px 1fr;font-size:12.5px}
+  .gym-info dd.fee{font-size:11.5px}
+}
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <h1>🧗 雙北捷運攀岩地圖</h1>
+  <p class="tagline">依捷運路線分類的台北 / 新北 / 桃園機捷沿線攀岩館資訊 · 含票價、地址、官方社群、Google Maps 跳轉</p>
+  <div class="meta">
+    <span class="stat">7 條路線</span>
+    <span class="stat">28 個攀岩場地</span>
+    <span class="stat">含天然岩場與免費場地</span>
+  </div>
+</header>
+
+<nav class="toc" aria-label="路線快速導覽">
+  <a href="#red"     style="background:#D0021B"><span class="lc">R</span>  淡水信義線</a>
+  <a href="#green"   style="background:#007B5E"><span class="lc">G</span>  松山新店線</a>
+  <a href="#orange"  style="background:#E77B00"><span class="lc">O</span>  中和新蘆線</a>
+  <a href="#blue"    style="background:#0070BD"><span class="lc">BL</span> 板南線</a>
+  <a href="#brown"   style="background:#C48A30"><span class="lc">BR</span> 文湖線</a>
+  <a href="#yellow"  style="background:#a88216"><span class="lc">Y</span>  環狀線</a>
+  <a href="#airport" style="background:#6A4FB8"><span class="lc">A</span>  桃園機捷</a>
+</nav>
+
+<main>
+
+<!-- ============ 淡水信義線 ============ -->
+<section class="line-section" id="red" style="border-left:5px solid #D0021B">
+  <div class="line-bar" style="background:linear-gradient(90deg,#D0021B 0%,#a30015 100%)">
+    <span class="badge">R</span> 淡水信義線
+    <span class="count">5 站 · 6 個場地</span>
+  </div>
+  <div class="gyms-grid">
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">北投大砲岩場</div>
+          <div class="gym-station"><span class="station-dot" style="background:#D0021B"></span>R22 北投站（需開車或計程車前往）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge free">免費</span><span class="tbadge outdoor">天然岩場</span><span class="tbadge">上攀</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=北投大砲岩" target="_blank" rel="noopener">台北市北投區（大砲岩天然岩場）</a></dd>
+        <dt>營業</dt><dd>全天開放（天候適宜時）</dd>
+        <dt>票價</dt><dd class="fee">免費（需自備裝備）
+北部代表性天然岩場之一</dd>
+        <dt>備註</dt><dd>天然岩場 · 無官方社群</dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">熱海岩場 ｜ 女巫岩場</div>
+          <div class="gym-station"><span class="station-dot" style="background:#D0021B"></span>R22 北投站（需開車前往）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge free">免費</span><span class="tbadge outdoor">天然岩場</span><span class="tbadge">上攀</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=熱海岩場+女巫岩場" target="_blank" rel="noopener">台北市北投區（熱海 / 女巫天然岩場）</a></dd>
+        <dt>營業</dt><dd>全天開放（天候適宜時）</dd>
+        <dt>票價</dt><dd class="fee">免費（需自備裝備）
+鄰近北投，與大砲岩同屬北部三大天然岩場</dd>
+        <dt>備註</dt><dd>天然岩場 · 無官方社群</dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">原岩攀岩館 明德店</div>
+          <div class="gym-station"><span class="station-dot" style="background:#D0021B"></span>R18 明德站</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">抱石</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=台北市北投區文林北路222號B1" target="_blank" rel="noopener">台北市北投區文林北路222號 B1</a></dd>
+        <dt>營業</dt><dd>平日 12:00–23:00 · 假日 10:00–22:00</dd>
+        <dt>票價</dt><dd class="fee">平日全日 $500｜下午 $350｜晚上 $450｜星光 20:30 $320
+假日全日 $550｜星光 19:30 $320｜岩鞋租借 $100</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://www.facebook.com/tupclimbing.mingde" target="_blank" rel="noopener">📘 Facebook</a>
+          <a class="social" href="https://tupclimbing.tw/branch/mingde" target="_blank" rel="noopener">🌐 官網</a>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">REDRock 紅石攀岩館</div>
+          <div class="gym-station"><span class="station-dot" style="background:#D0021B"></span>R15 劍潭站 / R16 士林站（步行可達）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">抱石</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=台北市士林區承德路四段261號B1" target="_blank" rel="noopener">台北市士林區承德路四段261號 B1</a></dd>
+        <dt>營業</dt><dd>平日 15:00–23:00（週一公休）· 假日 09:00–21:00</dd>
+        <dt>票價</dt><dd class="fee">成人全日約 $300（建議查官方FB確認最新票價）
+岩鞋租借 $100；有10次套票折扣</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://www.facebook.com/RedRock.Shilin/" target="_blank" rel="noopener">📘 Facebook</a>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">臺北市北投運動中心（Camp 4 達文西攀岩館）</div>
+          <div class="gym-station"><span class="station-dot" style="background:#D0021B"></span>R19 石牌站（步行約 10 分鐘）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">上攀</span><span class="tbadge">先鋒</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=台北市北投區石牌路一段39巷100號" target="_blank" rel="noopener">台北市北投區石牌路一段39巷100號（北投運動中心 2F）</a></dd>
+        <dt>營業</dt><dd>平日 13:00–21:30 · 假日 09:00–18:00</dd>
+        <dt>票價</dt><dd class="fee">綜合攀登 $160／次（入場費）
+為公立運動中心經營，費用親民
+9 公尺高上攀牆，由 Camp 4 攀岩館團隊經營</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://www.facebook.com/camp4.beitou/" target="_blank" rel="noopener">📘 Facebook</a>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">小岩館 The Little Rock 天母店</div>
+          <div class="gym-station"><span class="station-dot" style="background:#D0021B"></span>R15 劍潭 / R16 士林（轉公車 / 步行）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">抱石</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=台北市士林區忠誠路二段12號1樓" target="_blank" rel="noopener">台北市士林區忠誠路二段12號 1F</a></dd>
+        <dt>營業</dt><dd>平日 14:00–22:00 · 假日 10:00–19:00</dd>
+        <dt>票價</dt><dd class="fee">約 $280–$330（依時段；建議查官方FB確認最新票價）
+適合新手與親子；岩鞋租借 $100</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://www.facebook.com/thelittlerock.tianmu.2017/" target="_blank" rel="noopener">📘 Facebook</a>
+          <a class="social" href="https://www.instagram.com/thelittlerock.tianmu/" target="_blank" rel="noopener">📷 Instagram</a>
+        </dd>
+      </dl>
+    </article>
+
+  </div>
+</section>
+
+<!-- ============ 松山新店線 ============ -->
+<section class="line-section" id="green" style="border-left:5px solid #007B5E">
+  <div class="line-bar" style="background:linear-gradient(90deg,#007B5E 0%,#005a44 100%)">
+    <span class="badge">G</span> 松山新店線
+    <span class="count">4 站 · 7 個場地</span>
+  </div>
+  <div class="gyms-grid">
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">原岩攀岩館 新店店</div>
+          <div class="gym-station"><span class="station-dot" style="background:#007B5E"></span>G01 新店站（裕隆城 7F）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">抱石</span><span class="tbadge">上攀</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=新北市新店區中興路三段70號7樓" target="_blank" rel="noopener">新北市新店區中興路三段70號 7F（裕隆城）</a></dd>
+        <dt>營業</dt><dd>平日 11:00–23:00 · 週六 11:00–22:00 · 週日 11:00–21:30</dd>
+        <dt>票價</dt><dd class="fee">平日全日 $500｜假日全日 $550
+星光 2.5hr $300｜3小時票 $400</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://www.facebook.com/tupclimbing.xindian/" target="_blank" rel="noopener">📘 Facebook</a>
+          <a class="social" href="https://tupclimbing.tw/" target="_blank" rel="noopener">🌐 官網</a>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">新店瑠公攀岩基地</div>
+          <div class="gym-station"><span class="station-dot" style="background:#007B5E"></span>G03 七張站（小碧潭支線轉乘）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge free">免費</span><span class="tbadge outdoor">天然岩場</span><span class="tbadge">抱石</span><span class="tbadge">上攀</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=新店瑠公公園" target="_blank" rel="noopener">新北市新店區瑠公公園（天然岩場）</a></dd>
+        <dt>營業</dt><dd>全天開放</dd>
+        <dt>票價</dt><dd class="fee">免費（需自備裝備）</dd>
+        <dt>備註</dt><dd>戶外岩場 · 無官方社群</dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">公館水岸抱石場</div>
+          <div class="gym-station"><span class="station-dot" style="background:#007B5E"></span>G07 公館站（公館河濱）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge free">免費</span><span class="tbadge outdoor">河濱戶外</span><span class="tbadge">抱石</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=公館水岸抱石場" target="_blank" rel="noopener">台北市公館河濱（水岸抱石場）</a></dd>
+        <dt>營業</dt><dd>全天開放</dd>
+        <dt>票價</dt><dd class="fee">免費（需自備裝備）</dd>
+        <dt>備註</dt><dd>戶外抱石場 · 無官方社群</dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">永和獅子頭攀岩廣場</div>
+          <div class="gym-station"><span class="station-dot" style="background:#007B5E"></span>G07 公館站（永和河濱，福和橋附近）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge free">免費</span><span class="tbadge outdoor">河濱戶外</span><span class="tbadge">抱石</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=永和獅子頭攀岩廣場" target="_blank" rel="noopener">新北市永和區（獅子頭河濱攀岩廣場）</a></dd>
+        <dt>營業</dt><dd>全天開放</dd>
+        <dt>票價</dt><dd class="fee">免費（需自備裝備）
+位於永和河濱，公館站過福和橋可達</dd>
+        <dt>備註</dt><dd>戶外抱石場 · 無官方社群</dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">永和攀岩場（趣攀岩）</div>
+          <div class="gym-station"><span class="station-dot" style="background:#007B5E"></span>G07 公館站（步行至永和運動中心）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">抱石</span><span class="tbadge">上攀</span><span class="tbadge">先鋒</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=新北市永和區永利路250號6樓" target="_blank" rel="noopener">新北市永和區永利路250號 6F（永和國民運動中心）</a></dd>
+        <dt>營業</dt><dd>平日 13:00–22:00（17–18 休息）· 假日 09:00–22:00</dd>
+        <dt>票價</dt><dd class="fee">平日全日 $200｜假日全日 $250
+計時：尖峰 $80/hr｜離峰 $50/hr
+體驗（含教練）：抱石 $400｜上攀 $500
+新北最大攀岩場，符合國際賽事標準</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://www.facebook.com/yhclimbing/" target="_blank" rel="noopener">📘 Facebook</a>
+          <a class="social" href="https://www.instagram.com/titorocktw/" target="_blank" rel="noopener">📷 Instagram</a>
+          <a class="social" href="https://www.titohiking.com.tw/titorock-climbing/" target="_blank" rel="noopener">🌐 官網</a>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">Corner 角攀中山店</div>
+          <div class="gym-station"><span class="station-dot" style="background:#007B5E"></span>G14 / BL14 忠孝新生站</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">抱石</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=台北市中山區中山北路二段68號B1" target="_blank" rel="noopener">台北市中山區中山北路二段68號 B1</a></dd>
+        <dt>營業</dt><dd>平日 10:00–23:00 · 假日 09:00–21:00</dd>
+        <dt>票價</dt><dd class="fee">平日上午 $250｜下午 $300｜晚上 $350｜星光 $250
+假日 $350｜假日星光 $250｜岩鞋租借 $100
+（與華山店套票跨店通用）</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://www.facebook.com/corner.bouldering.zs/" target="_blank" rel="noopener">📘 Facebook</a>
+          <a class="social" href="https://www.instagram.com/corner_bouldering/" target="_blank" rel="noopener">📷 Instagram</a>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">Corner 角攀華山店</div>
+          <div class="gym-station"><span class="station-dot" style="background:#007B5E"></span>G14 / BL14 忠孝新生站</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">抱石</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=台北市中山區新生北路一段86號" target="_blank" rel="noopener">台北市中山區新生北路一段86號</a></dd>
+        <dt>營業</dt><dd>平日 10:00–23:00 · 假日 09:00–21:00</dd>
+        <dt>票價</dt><dd class="fee">平日上午 $250｜下午 $300｜晚上 $350｜星光 $250
+假日 $350｜假日星光 $250｜岩鞋租借 $100
+（與中山店套票跨店通用）</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://www.facebook.com/corner.bouldering/" target="_blank" rel="noopener">📘 Facebook</a>
+          <a class="social" href="https://www.instagram.com/corner_bouldering/" target="_blank" rel="noopener">📷 Instagram</a>
+        </dd>
+      </dl>
+    </article>
+
+  </div>
+</section>
+
+<!-- ============ 中和新蘆線 ============ -->
+<section class="line-section" id="orange" style="border-left:5px solid #E77B00">
+  <div class="line-bar" style="background:linear-gradient(90deg,#E77B00 0%,#b86200 100%)">
+    <span class="badge">O</span> 中和新蘆線
+    <span class="count">3 站 · 3 個場地</span>
+  </div>
+  <div class="gyms-grid">
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">EnJoin'</div>
+          <div class="gym-station"><span class="station-dot" style="background:#E77B00"></span>O12 中山國小站（4 號出口步行約 5 分鐘）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">抱石</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=台北市中山區吉林路309號1樓" target="_blank" rel="noopener">台北市中山區吉林路309號 1F（新壽公園對面）</a></dd>
+        <dt>營業</dt><dd>請查詢官網或致電確認 (02) 6617-2566</dd>
+        <dt>票價</dt><dd class="fee">複合式空間，提供體適能、抱石、靜坐等多元體驗
+詳細票價請查詢官網「動態體驗」頁面</dd>
+        <dt>特色</dt><dd>有別於專業岩館，EnJoin' 提供放鬆舒適的空間
+含一面簡單抱石牆，適合搭配其他活動體驗</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://enjoin.tw/" target="_blank" rel="noopener">🌐 官網</a>
+          <a class="social" href="https://enjoin.tw/dynamic/" target="_blank" rel="noopener">🧗 動態體驗</a>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">Mega Stone</div>
+          <div class="gym-station"><span class="station-dot" style="background:#E77B00"></span>O18 / Y18 頭前庄站（4 號出口步行 2 分鐘）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">抱石</span><span class="tbadge">上攀</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=新北市新莊區中正路56巷5號" target="_blank" rel="noopener">新北市新莊區中正路56巷5號</a></dd>
+        <dt>營業</dt><dd>平日 14:30–22:30 · 假日 10:00–20:00</dd>
+        <dt>票價</dt><dd class="fee">平日 $360（學生 $250、兒童 $180）
+假日 $400（學生 $300、兒童 $190）
+星光（最後 2hr） $240｜岩鞋租借 $100</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://www.facebook.com/MegaSTONE20190601/" target="_blank" rel="noopener">📘 Facebook</a>
+          <a class="social" href="https://www.instagram.com/megastoneclimbinggym/" target="_blank" rel="noopener">📷 Instagram</a>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">Double 8 岩究所（大稻埕館）</div>
+          <div class="gym-station"><span class="station-dot" style="background:#E77B00"></span>O11 大橋頭站</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">抱石</span><span class="tbadge">上攀</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=台北市大同區迪化街一段251號" target="_blank" rel="noopener">台北市大同區迪化街一段251號（老屋改建）</a></dd>
+        <dt>營業</dt><dd>平日 13:30–22:00（17:30–18:30 場館整理） · 假日 09:45–18:30（12:00–13:00 場館整理）</dd>
+        <dt>票價</dt><dd class="fee">平日 $250｜假日 $280（採預約制）
+特色：老屋攀岩、姻緣線路線、結合大稻埕街區文化</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://www.facebook.com/double8tw/" target="_blank" rel="noopener">📘 Facebook</a>
+          <a class="social" href="https://www.instagram.com/double8_climbing/" target="_blank" rel="noopener">📷 Instagram</a>
+        </dd>
+      </dl>
+    </article>
+
+  </div>
+</section>
+
+<!-- ============ 板南線 ============ -->
+<section class="line-section" id="blue" style="border-left:5px solid #0070BD">
+  <div class="line-bar" style="background:linear-gradient(90deg,#0070BD 0%,#004f87 100%)">
+    <span class="badge">BL</span> 板南線
+    <span class="count">4 站 · 5 間岩館</span>
+  </div>
+  <div class="gyms-grid">
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">新北市土城國民運動中心</div>
+          <div class="gym-station"><span class="station-dot" style="background:#0070BD"></span>BL04 海山站（步行可達）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">上攀</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=新北市土城國民運動中心" target="_blank" rel="noopener">新北市土城國民運動中心</a></dd>
+        <dt>營業</dt><dd>請查詢運動中心官網確認</dd>
+        <dt>票價</dt><dd class="fee">請洽運動中心櫃檯
+公立運動中心，費用親民</dd>
+        <dt>備註</dt><dd>運動中心攀岩館，建議事先電話確認開放時段</dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">原岩攀岩館 萬華店</div>
+          <div class="gym-station"><span class="station-dot" style="background:#0070BD"></span>BL10 龍山寺站</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">抱石</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=台北市萬華區大理街149號" target="_blank" rel="noopener">台北市萬華區大理街149號</a></dd>
+        <dt>營業</dt><dd>平日 10:00–23:00 · 假日 09:00–21:00</dd>
+        <dt>票價</dt><dd class="fee">平日全日 $450｜早鳥 10–13 $250｜下午 $350｜晚上 $420｜星光 $320
+假日全日 $500｜星光 $320｜岩鞋租借 $100</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://www.facebook.com/TupClimbingWanhua/" target="_blank" rel="noopener">📘 Facebook</a>
+          <a class="social" href="https://www.instagram.com/tupclimbing/" target="_blank" rel="noopener">📷 Instagram</a>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">Double 8 岩究所（Y17館）</div>
+          <div class="gym-station"><span class="station-dot" style="background:#0070BD"></span>BL12 / R10 台北車站（步行）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">上攀</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=台北市中正區仁愛路一段17號9樓" target="_blank" rel="noopener">台北市中正區仁愛路一段17號 9F（青發處 Y17）</a></dd>
+        <dt>營業</dt><dd>平日 13:00–21:30（17–18 休息）· 假日 10:00–18:30（12–13 休息）</dd>
+        <dt>票價</dt><dd class="fee">平日 $250｜假日 $280（採預約制）
+高 12 公尺上攀牆，台灣最早的攀岩場之一
+適合有基礎的進階者挑戰</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://www.facebook.com/double8tw/" target="_blank" rel="noopener">📘 Facebook</a>
+          <a class="social" href="https://www.instagram.com/double8_climbing/" target="_blank" rel="noopener">📷 Instagram</a>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">市民抱石攀岩館</div>
+          <div class="gym-station"><span class="station-dot" style="background:#0070BD"></span>BL23 南港展覽館站（5 號出口）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">抱石</span><span class="tbadge">上攀</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=台北市南港區市民大道八段552號2樓" target="_blank" rel="noopener">台北市南港區市民大道八段552號 2F</a></dd>
+        <dt>營業</dt><dd>平日 10:00–22:30 · 假日 10:00–20:30</dd>
+        <dt>票價</dt><dd class="fee">平日17前 $300｜全日約 $350｜假日 $400
+星光票 $250（平日 20:30 後 / 假日 18:30 後）
+岩鞋租借 $100｜免費咖啡 / 茶水暢飲</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://www.facebook.com/CivicBouldergymTaipei/" target="_blank" rel="noopener">📘 Facebook</a>
+          <a class="social" href="https://www.instagram.com/civic.bouldergym_taipei/" target="_blank" rel="noopener">📷 Instagram</a>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">原岩攀岩館 南港店</div>
+          <div class="gym-station"><span class="station-dot" style="background:#0070BD"></span>BL23 南港展覽館站</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">抱石</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=台北市南港區南港路二段147號" target="_blank" rel="noopener">台北市南港區南港路二段147號</a></dd>
+        <dt>營業</dt><dd>平日 12:00–23:00 · 假日 09:00–21:00</dd>
+        <dt>票價</dt><dd class="fee">平日全日 $450｜下午 $320｜晚上 $400｜星光 $300
+假日全日 $450｜星光 $300｜岩鞋租借 $100</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://www.facebook.com/TupClimbingNangang/" target="_blank" rel="noopener">📘 Facebook</a>
+          <a class="social" href="https://tupclimbing.tw/" target="_blank" rel="noopener">🌐 官網</a>
+        </dd>
+      </dl>
+    </article>
+
+  </div>
+</section>
+
+<!-- ============ 文湖線 ============ -->
+<section class="line-section" id="brown" style="border-left:5px solid #C48A30">
+  <div class="line-bar" style="background:linear-gradient(90deg,#C48A30 0%,#946622 100%)">
+    <span class="badge">BR</span> 文湖線
+    <span class="count">3 站 · 3 間岩館</span>
+  </div>
+  <div class="gyms-grid">
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">光合作用 內湖運動中心攀岩館</div>
+          <div class="gym-station"><span class="station-dot" style="background:#C48A30"></span>BR15 港墘站</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">抱石</span><span class="tbadge">上攀</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=台北市內湖區洲子街12號" target="_blank" rel="noopener">台北市內湖區洲子街12號（內湖運動中心）</a></dd>
+        <dt>營業</dt><dd>每日 09:00–22:00</dd>
+        <dt>票價</dt><dd class="fee">抱石區 $50/hr｜綜合攀登 $200/d
+岩鞋 $50｜吊帶 $50（公立運動中心，費用親民）
+戶外 15 米高國際標準上攀牆，亞洲第二難</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://www.facebook.com/climbing.nh/" target="_blank" rel="noopener">📘 Facebook</a>
+          <a class="social" href="https://www.outdoor-taiwan.com/rock_center/" target="_blank" rel="noopener">🌐 官網</a>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">Flow 心流抱石館</div>
+          <div class="gym-station"><span class="station-dot" style="background:#C48A30"></span>BR15 港墘站 / BR16 文德站（內湖科技園區內）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">抱石</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=台北市內湖區瑞光路258巷55號1樓" target="_blank" rel="noopener">台北市內湖區瑞光路258巷55號 1F</a></dd>
+        <dt>營業</dt><dd>平日 17:00–23:00 · 假日 10:00–19:00</dd>
+        <dt>票價</dt><dd class="fee">全日票 $350｜平日星光票（20:30 後入場） $300
+原小岩館內湖店改名而來；位於內湖科技園區
+適合內湖工作者下班運動</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://www.facebook.com/flowboulderinggym/" target="_blank" rel="noopener">📘 Facebook</a>
+          <a class="social" href="https://www.instagram.com/flowboulderinggym/" target="_blank" rel="noopener">📷 Instagram</a>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">奇岩攀岩館 Kirin Climbing Gym</div>
+          <div class="gym-station"><span class="station-dot" style="background:#C48A30"></span>BR22 / BL22 南港站（2 號出口步行 5 分鐘）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">抱石</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=台北市南港區忠孝東路七段512號1樓" target="_blank" rel="noopener">台北市南港區忠孝東路七段512號 1F</a></dd>
+        <dt>營業</dt><dd>平日 14:00–22:30 · 假日 10:00–20:00</dd>
+        <dt>票價</dt><dd class="fee">平假日 $300｜平日離峰（18:00 前） $220
+岩鞋租借 $100｜鎂粉免費使用
+台北最具挑戰性的抱石館，路線難度 VB–V6</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://www.facebook.com/KirinClimbingGym/" target="_blank" rel="noopener">📘 Facebook</a>
+          <a class="social" href="https://www.instagram.com/kirin_climbing_gym/" target="_blank" rel="noopener">📷 Instagram</a>
+          <a class="social" href="https://www.kirinclimbing.com.tw/" target="_blank" rel="noopener">🌐 官網</a>
+        </dd>
+      </dl>
+    </article>
+
+  </div>
+</section>
+
+<!-- ============ 環狀線 ============ -->
+<section class="line-section" id="yellow" style="border-left:5px solid #F8C821">
+  <div class="line-bar" style="background:linear-gradient(90deg,#d6a91c 0%,#a88216 100%)">
+    <span class="badge">Y</span> 環狀線
+    <span class="count">3 站 · 3 個場地</span>
+  </div>
+  <div class="gyms-grid">
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">原岩攀岩館 中和店</div>
+          <div class="gym-station"><span class="station-dot" style="background:#F8C821"></span>Y13 / O05 永安市場 / 中和站區域</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">上攀</span><span class="tbadge">先鋒</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=新北市中和區立言街41號" target="_blank" rel="noopener">新北市中和區立言街41號</a></dd>
+        <dt>營業</dt><dd>平日 12:00–23:00 · 假日 09:00–22:00</dd>
+        <dt>票價</dt><dd class="fee">平日全日 $500｜下午 $350｜晚上 $450｜星光 $320
+假日全日 $550｜假日星光 $320｜岩鞋吊帶各 $100
+1F 挑高 15 米上攀區（含 Top Rope、先鋒區、自動確保器）</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://www.facebook.com/TupClimbingZhongHe/" target="_blank" rel="noopener">📘 Facebook</a>
+          <a class="social" href="https://tupclimbing.tw/branch/zhonghe" target="_blank" rel="noopener">🌐 官網</a>
+        </dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">新北市新莊國民運動中心</div>
+          <div class="gym-station"><span class="station-dot" style="background:#F8C821"></span>Y18 / O18 頭前庄站（鄰近）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">上攀</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=新北市新莊區公園路11號" target="_blank" rel="noopener">新北市新莊區公園路11號 2F（新莊國民運動中心）</a></dd>
+        <dt>營業</dt><dd>週六、週日 09:00–18:00（採預約制）</dd>
+        <dt>票價</dt><dd class="fee">依時段計費，建議事先電話確認
+公立運動中心，費用親民</dd>
+        <dt>備註</dt><dd>需預約；過去由 WuSa 野地探索營運</dd>
+      </dl>
+    </article>
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">臺北市文山運動中心</div>
+          <div class="gym-station"><span class="station-dot" style="background:#F8C821"></span>環狀線文山段（萬芳醫院 / 萬隆區域）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">抱石</span><span class="tbadge">上攀</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=台北市文山區興隆路三段222號" target="_blank" rel="noopener">台北市文山區興隆路三段222號（文山運動中心）</a></dd>
+        <dt>營業</dt><dd>平日 18:00–22:00（週一公休）· 假日 13:00–18:00</dd>
+        <dt>票價</dt><dd class="fee">$150/hr（$250/3hr）
+公立運動中心，費用親民</dd>
+        <dt>備註</dt><dd>運動中心攀岩館，過去由 EcoPower 野岩館營運</dd>
+      </dl>
+    </article>
+
+  </div>
+</section>
+
+<!-- ============ 桃園機場捷運 ============ -->
+<section class="line-section" id="airport" style="border-left:5px solid #6A4FB8">
+  <div class="line-bar" style="background:linear-gradient(90deg,#6A4FB8 0%,#4d3899 100%)">
+    <span class="badge">A</span> 桃園機場捷運
+    <span class="count">1 站 · 1 間岩館</span>
+  </div>
+  <div class="gyms-grid">
+
+    <article class="gym">
+      <div class="gym-head">
+        <div>
+          <div class="gym-name">原岩攀岩館 A19 店</div>
+          <div class="gym-station"><span class="station-dot" style="background:#6A4FB8"></span>A19 桃園體育園區站（Global Mall 環球購物中心 4F）</div>
+        </div>
+        <div class="gym-types"><span class="tbadge">抱石</span><span class="tbadge">上攀</span><span class="tbadge">先鋒</span></div>
+      </div>
+      <dl class="gym-info">
+        <dt>地址</dt><dd><a href="https://www.google.com/maps/search/?api=1&query=桃園市中壢區高鐵南路二段352號4樓" target="_blank" rel="noopener">桃園市中壢區高鐵南路二段352號 4F（Global Mall 桃園 A19）</a></dd>
+        <dt>營業</dt><dd>平日 11:00–23:00 · 假日 11:00–22:00</dd>
+        <dt>票價</dt><dd class="fee">平日全日 $500｜下午 11–17 $350｜晚上 16–23 $400｜星光 $300
+假日全日 $550｜假日星光 $300｜3小時票 $400
+岩鞋吊帶各 $100</dd>
+        <dt>特色</dt><dd>8 米高上攀牆、6 道自動確保器、Top Rope 區、先鋒牆、寬敞抱石區
+位於環球購物中心內，可順便逛街用餐</dd>
+        <dt>社群</dt><dd>
+          <a class="social" href="https://www.facebook.com/TupClimbingA19/" target="_blank" rel="noopener">📘 Facebook</a>
+          <a class="social" href="https://www.instagram.com/tupclimbing/" target="_blank" rel="noopener">📷 Instagram</a>
+          <a class="social" href="https://tupclimbing.tw/branch/a19" target="_blank" rel="noopener">🌐 官網</a>
+        </dd>
+      </dl>
+    </article>
+
+  </div>
+</section>
+
+</main>
+
+<footer>
+  ⚠ <strong>票價及營業時間以實際現場公告為準</strong>，建議出發前再次查詢官方社群<br>
+  地址點擊可直接開啟 Google Maps｜📘 Facebook · 📷 Instagram · 🌐 官方網站<br><br>
+  本資料由攀岩同好整理彙整，歡迎於 <a href="https://github.com" target="_blank" rel="noopener">GitHub</a> 提出 issue 或 PR 補充更新。<br>
+  <span style="font-size:10.5px">資料來源：各岩館官方 FB / 官網、轟菌體能彙整文章 · 2024–2025 年最新整理</span>
+</footer>
+
+</body>
+</html>
