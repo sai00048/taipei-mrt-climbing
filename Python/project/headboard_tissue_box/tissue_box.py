@@ -164,6 +164,27 @@ def to_trimesh(m):
     return trimesh.Trimesh(vertices=np.array(mesh.vert_properties)[:, :3], faces=remap[faces])
 
 
+def on_plate(m, cx=90.0, cy=90.0):
+    """把物件放到 A1 mini 列印平台 (180x180) 中央, 底面貼 Z=0."""
+    m = m.copy()
+    lo, hi = m.bounds
+    m.apply_translation([cx - (lo[0] + hi[0]) / 2, cy - (lo[1] + hi[1]) / 2, -lo[2]])
+    return m
+
+
+def export_3mf(b, l):
+    """輸出 3MF: 主體、上蓋各一個 (各佔一個平台), 以及兩者合併的一個檔案."""
+    b, l = on_plate(b), on_plate(l)
+    b.export(os.path.join(OUT, "tissue_box_body.3mf"))
+    l.export(os.path.join(OUT, "tissue_box_lid.3mf"))
+    # 合併檔: 兩件放不進同一個 180x180 平台, 上蓋放在旁邊, 匯入後在 Bambu Studio 按「排列」會自動分到兩個平台
+    l2 = l.copy(); l2.apply_translation([200, 0, 0])
+    scene = trimesh.Scene()
+    scene.add_geometry(b, node_name="tissue_box_body", geom_name="tissue_box_body")
+    scene.add_geometry(l2, node_name="tissue_box_lid", geom_name="tissue_box_lid")
+    scene.export(os.path.join(OUT, "tissue_box_all.3mf"))
+
+
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     b = to_trimesh(body())
@@ -173,3 +194,4 @@ if __name__ == "__main__":
     print("inner cavity", W - 2 * WALL, DB - 2 * WALL, H - LID_T - FLOOR)
     b.export(os.path.join(OUT, "tissue_box_body.stl"))
     l.export(os.path.join(OUT, "tissue_box_lid.stl"))
+    export_3mf(b, l)
