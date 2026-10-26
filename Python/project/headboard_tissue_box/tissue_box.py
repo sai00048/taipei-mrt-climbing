@@ -8,7 +8,7 @@
 import os
 import numpy as np
 import trimesh
-from manifold3d import Manifold, CrossSection
+from manifold3d import Manifold, CrossSection, JoinType, OpType
 
 # ---------- 參數 (mm) ----------
 TISSUE_L = 140.0    # 衛生紙長 (與衛生紙開口同方向)
@@ -32,6 +32,10 @@ LIP_T = 1.6         # 上蓋內嵌唇厚
 LIP_H = 6.0         # 上蓋內嵌唇深度
 LID_CLR = 0.3       # 上蓋配合間隙
 NOTCH_R = 9.0       # 前緣掀蓋手指缺口半徑
+EDGE_R = 3.0        # 盒身外部所有邊角的圓角半徑
+THIN_EDGE_R = 1.5   # 跨板橫樑與背面扣腳 (較薄) 的圓角半徑
+SLOT_EDGE_R = 1.4   # 抽取口與手指缺口邊緣的圓角半徑 (前壁內外兩側)
+LID_EDGE_R = 1.0    # 上蓋外緣圓角半徑
 
 PACK_ALONG = TISSUE_W if SLOT_VERTICAL else TISSUE_L  # 衛生紙沿床頭板方向的尺寸
 PACK_UP = TISSUE_L if SLOT_VERTICAL else TISSUE_W     # 衛生紙高度方向的尺寸
@@ -49,22 +53,64 @@ def yz_extrude_x(pts, length):
     return m.transform([[0, 0, 1, 0], [1, 0, 0, 0], [0, 1, 0, 0]])
 
 
-def stadium(length, width, depth, n=48):
-    r = width / 2
-    a = np.linspace(-np.pi / 2, np.pi / 2, n)
-    right = [((length / 2 - r) + r * np.cos(t), r * np.sin(t)) for t in a]
-    left = [(-(length / 2 - r) - r * np.cos(t), -r * np.sin(t)) for t in a]
-    return CrossSection([right + left]).extrude(depth)  # 在 XY 平面, 沿 Z 擠出
+def fillet_flare(r, n=16):
+    """圓角輪廓: 回傳 (距表面深度 z, 擴孔量 e) 列表, z 由 0 到 r."""
+    zs = np.linspace(0, r, n + 1)
+    return [(z, r - np.sqrt(max(r * r - (r - z) ** 2, 0.0))) for z in zs]
+
+
+def filleted_round_cut(radius, thick, r):
+    """圓形開孔刀具 (旋轉體, 軸 = Z), 穿過 Z=0..thick 的壁, 兩側邊緣做半徑 r 的平滑圓角."""
+    fl = fillet_flare(r)
+    pts = [(0, -1), (radius + r, -1)]
+    pts += [(radius + e, z) for z, e in fl]
+    pts += [(radius + e, thick - z) for z, e in reversed(fl)]
+    pts += [(radius + r, thick + 1), (0, thick + 1)]
+    return Manifold.revolve(CrossSection([pts]), 96)
+
+
+def filleted_slot_cut(length, width, thick, r):
+    """圓角長孔刀具 (長邊沿 X, 中心在原點), 穿過 Z=0..thick 的壁, 兩側邊緣做半徑 r 的平滑圓角."""
+    half = width / 2
+    ends = [filleted_round_cut(half, thick, r).translate([sx * (length / 2 - half), 0, 0]) for sx in (-1, 1)]
+    fl = fillet_flare(r)
+    right = [(half + r, -1)] + [(half + e, z) for z, e in fl] + [(half + e, thick - z) for z, e in reversed(fl)] + [(half + r, thick + 1)]
+    left = [(-y, z) for y, z in reversed(right)]
+    mid = yz_extrude_x(right + left, length - width).translate([-(length - width) / 2, 0, 0])
+    return Manifold.batch_boolean(ends + [mid], OpType.Add)
+
+
+def rounded_box(p0, p1, r):
+    """所有邊角半徑 r 的圓角方塊."""
+    size = [b - a - 2 * r for a, b in zip(p0, p1)]
+    core = Manifold.cube(size).translate([a + r for a in p0])
+    return core.minkowski_sum(Manifold.sphere(r, 32))
+
+
+def filleted_round_cut(radius, thick, r, n=16):
+    """圓形開孔刀具 (旋轉體), 兩側表面邊緣做半徑 r 的平滑圓角."""
+    zs = np.linspace(0, r, n + 1)
+    flare = [radius + r - np.sqrt(max(r * r - (r - z) ** 2, 0.0)) for z in zs]
+    pts = [(0, -1), (radius + r, -1)]
+    pts += [(f, z) for f, z in zip(flare, zs)]
+    pts += [(f, thick - z) for f, z in reversed(list(zip(flare, zs)))]
+    pts += [(radius + r, thick + 1), (0, thick + 1)]
+    return Manifold.revolve(CrossSection([pts]), 96)
+
+
+def to_front_wall(cutter, x, z):
+    """把在 XY 平面建立的刀具轉到前壁 (Y=0..WALL), 中心放在 (x, z)."""
+    return cutter.rotate([-90, 0, 0]).translate([x, 0, z])  # (x,y,z)->(x,z,-y)
 
 
 def body():
     y1 = DB + GAP            # 背面扣腳內側
     zt = H - TOP_T           # 床頭板頂端高度
-    prof = [
-        (0, 0), (DB, 0), (DB, zt), (y1, zt), (y1, H - BACK_LEG),
-        (D_TOTAL, H - BACK_LEG), (D_TOTAL, H), (0, H),
-    ]
-    outer = yz_extrude_x(prof, W)
+    # 外形分三塊各自做圓角後聯集: 盒身 (EDGE_R), 跨板橫樑與背面扣腳 (較薄, 用 THIN_EDGE_R)
+    box = rounded_box([0, 0, 0], [W, DB, H], EDGE_R)
+    bridge = rounded_box([0, DB - 2 * EDGE_R, zt], [W, D_TOTAL, H], THIN_EDGE_R)
+    leg = rounded_box([0, y1, H - BACK_LEG], [W, D_TOTAL, H], THIN_EDGE_R)
+    outer = box + bridge + leg
 
     # 收納空間: 底板到上蓋下緣
     cavity = Manifold.cube([W - 2 * WALL, DB - 2 * WALL, H - LID_T - FLOOR + 0.01]).translate([WALL, WALL, FLOOR])
@@ -74,20 +120,22 @@ def body():
 
     # 抽取口: 朝床的垂直面 (Y=0)
     zc = SLOT_Z if SLOT_Z is not None else (FLOOR + H - LID_T) / 2
-    slot = stadium(SLOT_L, SLOT_W, WALL + 2)
+    slot = filleted_slot_cut(SLOT_L, SLOT_W, WALL, SLOT_EDGE_R)
     if SLOT_VERTICAL:
-        slot = slot.rotate([0, 0, 90])  # 長邊轉到 Y, 下一步轉到 XZ 平面後即為垂直
-    slot = slot.rotate([-90, 0, 0]).translate([W / 2, -1, zc])  # (x,y,z)->(x,z,-y), 沿 +Y 穿過前壁
+        slot = slot.rotate([0, 0, 90])  # 轉到前壁後即與地面垂直
+    slot = to_front_wall(slot, W / 2, zc)
 
     # 前緣中央手指缺口, 方便掀開上蓋
-    notch = Manifold.cylinder(WALL + 2, NOTCH_R, NOTCH_R, 64).rotate([-90, 0, 0]).translate([W / 2, -1, H])
+    notch = to_front_wall(filleted_round_cut(NOTCH_R, WALL, SLOT_EDGE_R), W / 2, H)
     return outer - cavity - recess - slot - notch
 
 
 def lid():
     pw = W - 2 * (WALL - LEDGE) - 2 * LID_CLR
     pd = DB - 2 * (WALL - LEDGE) - 2 * LID_CLR
-    plate = Manifold.cube([pw, pd, LID_T])
+    r = LID_EDGE_R
+    plate = Manifold.cube([pw - 2 * r, pd - 2 * r, LID_T - 2 * r]).translate([r, r, r])
+    plate = plate.minkowski_sum(Manifold.sphere(r, 24))
     iw = W - 2 * WALL - 2 * LID_CLR
     idp = DB - 2 * WALL - 2 * LID_CLR
     lip_o = Manifold.cube([iw, idp, LIP_H])
@@ -109,7 +157,11 @@ def lid_installed():
 
 def to_trimesh(m):
     mesh = m.to_mesh()
-    return trimesh.Trimesh(vertices=np.array(mesh.vert_properties)[:, :3], faces=np.array(mesh.tri_verts))
+    faces = np.array(mesh.tri_verts)
+    # 依 manifold 提供的合併表把重複頂點接回, 確保輸出的 STL 是封閉網格
+    remap = np.arange(len(mesh.vert_properties))
+    remap[np.array(mesh.merge_from_vert, dtype=int)] = np.array(mesh.merge_to_vert, dtype=int)
+    return trimesh.Trimesh(vertices=np.array(mesh.vert_properties)[:, :3], faces=remap[faces])
 
 
 if __name__ == "__main__":
