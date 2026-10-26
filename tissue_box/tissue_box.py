@@ -11,17 +11,18 @@ import trimesh
 from manifold3d import Manifold, CrossSection
 
 # ---------- 參數 (mm) ----------
-W = 178.0           # 外寬 (沿床頭板)
-H = 178.0           # 外高
-DB = 95.0           # 盒子外深 (不含跨板部分)
+TISSUE_L = 140.0    # 衛生紙長 (沿床頭板, 與抽取口同方向)
+TISSUE_W = 100.0    # 衛生紙寬 (直立後為高度)
+TISSUE_H = 77.0     # 衛生紙厚 (直立後為深度, 朝床方向)
+TISSUE_CLR = 4.0    # 衛生紙每個方向的總餘隙 (方便放入)
 WALL = 3.0          # 壁厚
 FLOOR = 2.4         # 底厚
-BOARD_T = 20.0      # 床頭板厚度 (之後可調)
+BOARD_T = 27.4      # 床頭板厚度
 BOARD_CLR = 1.0     # 床頭板夾槽餘隙
 TOP_T = 5.0         # 跨在床頭板頂端的橫樑厚度 (= 高出床頭板的高度)
 BACK_LEG = 40.0     # 背面扣腳往下的長度
 BACK_T = 4.0        # 背面扣腳厚度
-SLOT_L = 120.0      # 抽取口長度
+SLOT_L = 110.0      # 抽取口長度
 SLOT_W = 18.0       # 抽取口寬度
 SLOT_Z = None       # 抽取口中心高度 (None = 收納空間正中央)
 LID_T = 2.4         # 上蓋厚 (與頂面齊平)
@@ -31,6 +32,9 @@ LIP_H = 6.0         # 上蓋內嵌唇深度
 LID_CLR = 0.3       # 上蓋配合間隙
 NOTCH_R = 9.0       # 前緣掀蓋手指缺口半徑
 
+W = TISSUE_L + TISSUE_CLR + 2 * WALL           # 外寬 (沿床頭板)
+DB = TISSUE_H + TISSUE_CLR + 2 * WALL          # 盒子外深 (不含跨板部分)
+H = FLOOR + TISSUE_W + TISSUE_CLR + LID_T      # 外高
 GAP = BOARD_T + BOARD_CLR
 D_TOTAL = DB + GAP + BACK_T
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "output")
