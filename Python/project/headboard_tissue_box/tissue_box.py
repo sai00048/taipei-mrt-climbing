@@ -37,7 +37,7 @@ DB = TISSUE_H + TISSUE_CLR + 2 * WALL          # 盒子外深 (不含跨板部�
 H = FLOOR + TISSUE_W + TISSUE_CLR + LID_T      # 外高
 GAP = BOARD_T + BOARD_CLR
 D_TOTAL = DB + GAP + BACK_T
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "output")
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
 
 
 def yz_extrude_x(pts, length):
