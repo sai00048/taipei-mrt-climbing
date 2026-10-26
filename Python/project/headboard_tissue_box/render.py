@@ -52,10 +52,11 @@ ax.add_patch(Rectangle((tb.WALL, tb.FLOOR), tb.DB - 2 * tb.WALL, z_top_cav - tb.
 ax.add_patch(Rectangle((tb.WALL - tb.LEDGE, z_top_cav), tb.DB - 2 * (tb.WALL - tb.LEDGE), tb.LID_T, fc=LID_C, ec="k"))
 ax.add_patch(Rectangle((by0, -70), tb.BOARD_T, zt + 70, fc=BOARD_C, ec="k", alpha=0.85))
 ax.text(by0 + tb.BOARD_T / 2, -20, f"床頭板 {tb.BOARD_T:.1f} mm", ha="center", va="center", color="white", fontsize=11, rotation=90)
-ax.add_patch(Rectangle((tb.WALL + tb.TISSUE_CLR / 2, tb.FLOOR), tb.TISSUE_H, tb.TISSUE_W, fc="#f4f1e8", ec="#999", hatch="||"))
-ax.text(tb.WALL + tb.TISSUE_CLR / 2 + tb.TISSUE_H / 2, tb.FLOOR + tb.TISSUE_W * 0.75, f"衛生紙(直立)\n{tb.TISSUE_L:.0f}×{tb.TISSUE_W:.0f}×{tb.TISSUE_H:.0f}", ha="center", va="center", fontsize=10, bbox=dict(fc="white", ec="none", alpha=0.8))
+ax.add_patch(Rectangle((tb.WALL + tb.TISSUE_CLR / 2, tb.FLOOR), tb.TISSUE_H, tb.PACK_UP, fc="#f4f1e8", ec="#999", hatch="||"))
+ax.text(tb.WALL + tb.TISSUE_CLR / 2 + tb.TISSUE_H / 2, tb.FLOOR + tb.PACK_UP * 0.85, f"衛生紙\n高 {tb.PACK_UP:.0f}・厚 {tb.TISSUE_H:.0f}", ha="center", va="center", fontsize=10, bbox=dict(fc="white", ec="none", alpha=0.8))
 zc = tb.SLOT_Z if tb.SLOT_Z is not None else (tb.FLOOR + z_top_cav) / 2
-ax.add_patch(Rectangle((-0.5, zc - tb.SLOT_W / 2), tb.WALL + 1, tb.SLOT_W, fc="red", ec="red"))
+slot_h = tb.SLOT_L if tb.SLOT_VERTICAL else tb.SLOT_W
+ax.add_patch(Rectangle((-0.5, zc - slot_h / 2), tb.WALL + 1, slot_h, fc="red", ec="red"))
 ax.add_patch(FancyArrowPatch((5, zc), (-70, zc), arrowstyle="-|>", mutation_scale=25, color="red", lw=2.5))
 ax.text(-38, zc + 8, "抽取方向\n(朝床, 與床頭板垂直)", ha="center", color="red", fontsize=11)
 ax.axhline(zt, color="gray", ls=":", lw=1)

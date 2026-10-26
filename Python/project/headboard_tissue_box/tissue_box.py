@@ -11,9 +11,10 @@ import trimesh
 from manifold3d import Manifold, CrossSection
 
 # ---------- 參數 (mm) ----------
-TISSUE_L = 140.0    # 衛生紙長 (沿床頭板, 與抽取口同方向)
-TISSUE_W = 100.0    # 衛生紙寬 (直立後為高度)
-TISSUE_H = 77.0     # 衛生紙厚 (直立後為深度, 朝床方向)
+TISSUE_L = 140.0    # 衛生紙長 (與衛生紙開口同方向)
+TISSUE_W = 100.0    # 衛生紙寬
+TISSUE_H = 77.0     # 衛生紙厚 (朝床方向)
+SLOT_VERTICAL = True  # True: 抽取開口與地面垂直 (長邊 140 站直); False: 開口水平 (長邊沿床頭板)
 TISSUE_CLR = 4.0    # 衛生紙每個方向的總餘隙 (方便放入)
 WALL = 3.0          # 壁厚
 FLOOR = 2.4         # 底厚
@@ -32,9 +33,11 @@ LIP_H = 6.0         # 上蓋內嵌唇深度
 LID_CLR = 0.3       # 上蓋配合間隙
 NOTCH_R = 9.0       # 前緣掀蓋手指缺口半徑
 
-W = TISSUE_L + TISSUE_CLR + 2 * WALL           # 外寬 (沿床頭板)
+PACK_ALONG = TISSUE_W if SLOT_VERTICAL else TISSUE_L  # 衛生紙沿床頭板方向的尺寸
+PACK_UP = TISSUE_L if SLOT_VERTICAL else TISSUE_W     # 衛生紙高度方向的尺寸
+W = PACK_ALONG + TISSUE_CLR + 2 * WALL         # 外寬 (沿床頭板)
 DB = TISSUE_H + TISSUE_CLR + 2 * WALL          # 盒子外深 (不含跨板部分)
-H = FLOOR + TISSUE_W + TISSUE_CLR + LID_T      # 外高
+H = FLOOR + PACK_UP + TISSUE_CLR + LID_T       # 外高
 GAP = BOARD_T + BOARD_CLR
 D_TOTAL = DB + GAP + BACK_T
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
@@ -72,6 +75,8 @@ def body():
     # 抽取口: 朝床的垂直面 (Y=0)
     zc = SLOT_Z if SLOT_Z is not None else (FLOOR + H - LID_T) / 2
     slot = stadium(SLOT_L, SLOT_W, WALL + 2)
+    if SLOT_VERTICAL:
+        slot = slot.rotate([0, 0, 90])  # 長邊轉到 Y, 下一步轉到 XZ 平面後即為垂直
     slot = slot.rotate([-90, 0, 0]).translate([W / 2, -1, zc])  # (x,y,z)->(x,z,-y), 沿 +Y 穿過前壁
 
     # 前緣中央手指缺口, 方便掀開上蓋
